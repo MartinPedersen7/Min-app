@@ -1,10 +1,10 @@
 {
-  "name": "Min opgave-app",
-  "short_name": "Opgaver",
+  "name": "Indkøb",
+  "short_name": "Indkøb",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f2f2f2",
+  "background_color": "#f4f7fb",
   "theme_color": "#2563eb",
-  "description": "En simpel opgave-app bygget som PWA",
+  "description": "En enkel fælles indkøbsseddel",
   "icons": []
 }

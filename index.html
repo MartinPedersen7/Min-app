@@ -3,34 +3,166 @@
 <head>
   <meta charset="UTF-8">
 
-  <!-- Gør appen mobilvenlig -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>App navn 2</title>
+  <title>Indkøb</title>
 
-  <!-- Design -->
-  <link rel="stylesheet" href="style.css">
-
-  <!-- PWA manifest -->
-  <link rel="manifest" href="manifest.json">
-
-  <!-- Farve på mobil-browserens topbjælke -->
   <meta name="theme-color" content="#2563eb">
+  <meta name="description" content="En enkel fælles indkøbsseddel">
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <main class="app">
-    <h1>Nyt navn igen</h1>
+  <section id="storeStartScreen" class="store-start-screen">
+    <div class="store-start-inner">
+      <p class="eyebrow">Vælg butik</p>
+      <h1>Indkøb</h1>
+      <p class="start-text">Vælg hvilken butik indkøbssedlen er til.</p>
 
-    <p class="intro">Skriv en opgave, du gerne vil huske.</p>
+      <div class="store-grid">
+        <button class="store-card" type="button" data-store="rema1000">
+          <img src="logo-rema1000.png" alt="Rema1000 logo">
+          <span>Rema1000</span>
+        </button>
 
-    <div class="input-omraade">
-      <input id="opgaveInput" type="text" placeholder="Fx Ring til Jens">
-      <button onclick="tilfoejOpgave()">Tilføj</button>
+        <button class="store-card" type="button" data-store="netto">
+          <img src="logo-netto.png" alt="Netto logo">
+          <span>Netto</span>
+        </button>
+
+        <button class="store-card" type="button" data-store="spar">
+          <img src="logo-spar.png" alt="Spar logo">
+          <span>Spar</span>
+        </button>
+
+        <button class="store-card" type="button" data-store="365">
+          <img src="logo-365.png" alt="365 discount logo">
+          <span>365</span>
+        </button>
+      </div>
     </div>
+  </section>
 
-    <ul id="opgaveListe"></ul>
-  </main>
+  <div id="appShell" class="app-shell hidden">
+
+    <header class="app-header">
+      <div class="selected-store">
+        <img id="selectedStoreLogo" src="" alt="" class="selected-store-logo">
+
+        <div>
+          <p class="eyebrow">Indkøbsseddel til</p>
+          <h1 id="selectedStoreName">Indkøb</h1>
+        </div>
+      </div>
+
+      <div class="counter-card">
+        <span id="itemsLeftCount">0</span>
+        <small>varer tilbage</small>
+      </div>
+    </header>
+
+    <section class="toolbar">
+      <button id="changeStoreButton" class="secondary-button" type="button">
+        Skift butik
+      </button>
+    </section>
+
+    <main class="main-content">
+
+      <section class="add-card">
+        <form id="addItemForm">
+          <label for="itemInput">Tilføj vare</label>
+
+          <div class="input-row">
+            <input
+              id="itemInput"
+              type="text"
+              autocomplete="off"
+              placeholder="Fx 2 mælk, bananer 6 stk, kaffe x2"
+            >
+
+            <button class="primary-button" type="submit">
+              Tilføj
+            </button>
+          </div>
+        </form>
+
+        <p class="input-help">
+          Tip: Skriv fx “2 mælk”, “bananer 6 stk” eller “kaffe x2”.
+        </p>
+      </section>
+
+      <section id="emptyState" class="empty-state hidden">
+        <h2>Ingen varer endnu</h2>
+        <p>Tilføj de første varer til listen.</p>
+      </section>
+
+      <section id="activeItemsArea" class="items-area"></section>
+
+      <section id="checkedItemsSection" class="checked-section hidden">
+        <div class="section-title-row">
+          <h2>Købt</h2>
+
+          <button id="clearCheckedButton" class="danger-button" type="button">
+            Ryd købte
+          </button>
+        </div>
+
+        <div id="checkedItemsArea" class="items-area checked-items"></div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <dialog id="editDialog" class="edit-dialog">
+    <form id="editForm" method="dialog">
+      <div class="dialog-header">
+        <h2>Rediger vare</h2>
+        <button id="closeDialogButton" class="icon-button" type="button" aria-label="Luk">
+          ×
+        </button>
+      </div>
+
+      <label for="editName">Varenavn</label>
+      <input id="editName" type="text">
+
+      <div class="two-column">
+        <div>
+          <label for="editQuantity">Mængde</label>
+          <input id="editQuantity" type="text" placeholder="Fx 2">
+        </div>
+
+        <div>
+          <label for="editUnit">Enhed</label>
+          <input id="editUnit" type="text" placeholder="Fx stk">
+        </div>
+      </div>
+
+      <label for="editCategory">Kategori</label>
+      <select id="editCategory"></select>
+
+      <label for="editNote">Note</label>
+      <textarea id="editNote" rows="3" placeholder="Fx bestemt mærke, tilbud eller variant"></textarea>
+
+      <div class="dialog-actions">
+        <button id="deleteFromDialogButton" class="danger-button" type="button">
+          Slet
+        </button>
+
+        <button class="primary-button" type="submit">
+          Gem
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast hidden">
+    <span id="toastText">Slettet</span>
+    <button id="undoButton" type="button">Fortryd</button>
+  </div>
 
   <script src="script.js"></script>
 </body>
