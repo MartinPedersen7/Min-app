@@ -1,4 +1,4 @@
-const CACHE_NAME = "indkoeb-v4";
+const CACHE_NAME = "indkoeb-v7";
 
 const FILES_TO_CACHE = [
   "./",
@@ -9,7 +9,10 @@ const FILES_TO_CACHE = [
   "./logo-rema1000.png",
   "./logo-netto.png",
   "./logo-spar.png",
-  "./logo-365.png"
+  "./logo-365.png",
+  "./apple-touch-icon.png",
+  "./icon-192.png",
+  "./icon-512.png"
 ];
 
 self.addEventListener("install", function(event) {

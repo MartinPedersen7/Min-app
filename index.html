@@ -2,24 +2,27 @@
 <html lang="da">
 <head>
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Indkøb</title>
 
   <meta name="theme-color" content="#2563eb">
   <meta name="description" content="En enkel fælles indkøbsseddel">
 
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <section id="storeStartScreen" class="store-start-screen">
-    <div class="store-start-inner">
-      <p class="eyebrow">Vælg butik</p>
-      <h1>Indkøb</h1>
-      <p class="start-text">Vælg hvilken butik indkøbssedlen er til.</p>
+    <div class="welcome-card">
+      <div class="welcome-top">
+        <p class="welcome-kicker">Fælles indkøbsliste</p>
+        <h1>Indkøb</h1>
+        <p class="welcome-text">
+          Vælg hvilken butik jeres indkøbsseddel er til.
+        </p>
+      </div>
 
       <div class="store-grid">
         <button class="store-card" type="button" data-store="rema1000">
@@ -43,29 +46,35 @@
         </button>
       </div>
 
-      <p id="startSyncStatus" class="start-sync-status">Forbinder til fælles liste...</p>
+      <div class="welcome-footer">
+        <p id="startSyncStatus" class="start-sync-status">Forbinder til fælles liste...</p>
+      </div>
     </div>
   </section>
 
   <div id="appShell" class="app-shell hidden">
 
-    <header class="app-header">
-      <div class="selected-store">
-        <img id="selectedStoreLogo" src="" alt="" class="selected-store-logo">
+    <header class="hero-card">
+      <div class="hero-main">
+        <div class="store-badge">
+          <img id="selectedStoreLogo" src="" alt="" class="selected-store-logo">
+        </div>
 
-        <div>
-          <p class="eyebrow">Indkøbsseddel til</p>
+        <div class="hero-text">
+          <p class="hero-label">Indkøbsseddel til</p>
           <h1 id="selectedStoreName">Indkøb</h1>
         </div>
       </div>
 
-      <div class="counter-card">
-        <span id="itemsLeftCount">0</span>
-        <small>varer tilbage</small>
+      <div class="hero-stats">
+        <div class="stat-card">
+          <span id="itemsLeftCount">0</span>
+          <small>varer tilbage</small>
+        </div>
       </div>
     </header>
 
-    <section class="toolbar">
+    <section class="top-toolbar">
       <button id="changeStoreButton" class="secondary-button" type="button">
         Skift butik
       </button>
@@ -88,7 +97,6 @@
               autocomplete="off"
               placeholder="Fx 2 mælk, bananer 6 stk, kaffe x2"
             >
-
             <button class="primary-button" type="submit">
               Tilføj
             </button>
@@ -96,11 +104,12 @@
         </form>
 
         <p class="input-help">
-          Tip: Skriv fx “2 mælk”, “bananer 6 stk” eller “kaffe x2”.
+          Tip: skriv fx “2 mælk”, “bananer 6 stk” eller “kaffe x2”.
         </p>
       </section>
 
       <section id="emptyState" class="empty-state hidden">
+        <div class="empty-icon">🛒</div>
         <h2>Ingen varer endnu</h2>
         <p>Tilføj de første varer til listen.</p>
       </section>
@@ -109,7 +118,10 @@
 
       <section id="checkedItemsSection" class="checked-section hidden">
         <div class="section-title-row">
-          <h2>Købt</h2>
+          <div>
+            <p class="section-kicker">Færdige varer</p>
+            <h2>Købt</h2>
+          </div>
 
           <button id="clearCheckedButton" class="danger-button" type="button">
             Ryd købte
@@ -120,13 +132,16 @@
       </section>
 
     </main>
-
   </div>
 
   <dialog id="editDialog" class="edit-dialog">
     <form id="editForm" method="dialog">
       <div class="dialog-header">
-        <h2>Rediger vare</h2>
+        <div>
+          <p class="dialog-kicker">Redigering</p>
+          <h2>Rediger vare</h2>
+        </div>
+
         <button id="closeDialogButton" class="icon-button" type="button" aria-label="Luk">
           ×
         </button>
