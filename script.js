@@ -125,6 +125,7 @@ let selectedStoreId = "";
 let editingItemId = null;
 let lastDeletedItem = null;
 let toastTimer = null;
+let showCheckedItems = false;
 
 const storeStartScreen = document.getElementById("storeStartScreen");
 const appShell = document.getElementById("appShell");
@@ -134,6 +135,8 @@ const selectedStoreName = document.getElementById("selectedStoreName");
 const addItemForm = document.getElementById("addItemForm");
 const itemInput = document.getElementById("itemInput");
 const changeStoreButton = document.getElementById("changeStoreButton");
+const toggleCheckedButton = document.getElementById("toggleCheckedButton");
+const newListButton = document.getElementById("newListButton");
 const itemsLeftCount = document.getElementById("itemsLeftCount");
 const activeItemsArea = document.getElementById("activeItemsArea");
 const checkedItemsSection = document.getElementById("checkedItemsSection");
@@ -188,9 +191,16 @@ function registerEvents() {
     await updateHouseholdStore("");
   });
 
+  toggleCheckedButton.addEventListener("click", function() {
+    showCheckedItems = !showCheckedItems;
+    renderApp();
+  });
+
+  newListButton.addEventListener("click", startNewList);
+
   addItemForm.addEventListener("submit", async function(event) {
     event.preventDefault();
-    await addItemFromInput();
+    await addItemsFromInput();
   });
 
   clearCheckedButton.addEventListener("click", clearCheckedItems);
@@ -275,7 +285,7 @@ async function updateHouseholdStore(storeId) {
 
 async function selectStore(storeId) {
   await updateHouseholdStore(storeId);
-  window.scrollTo({ top: 0, behavior: "instant" });
+  window.scrollTo({ top: 0, behavior: "auto" });
 
   setTimeout(function() {
     itemInput.focus();
@@ -288,7 +298,7 @@ function applyStoreView() {
   if (!selectedStore) {
     appShell.classList.add("hidden");
     storeStartScreen.classList.remove("hidden");
-    window.scrollTo({ top: 0, behavior: "instant" });
+    window.scrollTo({ top: 0, behavior: "auto" });
     return;
   }
 
@@ -299,7 +309,7 @@ function applyStoreView() {
   selectedStoreLogo.alt = selectedStore.name + " logo";
   selectedStoreName.textContent = selectedStore.name;
 
-  window.scrollTo({ top: 0, behavior: "instant" });
+  window.scrollTo({ top: 0, behavior: "auto" });
 }
 
 function getSelectedStore() {
@@ -308,7 +318,7 @@ function getSelectedStore() {
   });
 }
 
-async function addItemFromInput() {
+async function addItemsFromInput() {
   const rawValue = itemInput.value.trim();
 
   if (!rawValue) {
@@ -316,8 +326,41 @@ async function addItemFromInput() {
     return;
   }
 
-  const parsed = parseItemInput(rawValue);
+  const rawItems = splitInputIntoItems(rawValue);
 
+  if (rawItems.length === 0) {
+    itemInput.focus();
+    return;
+  }
+
+  try {
+    await Promise.all(
+      rawItems.map(function(rawItem, index) {
+        return addSingleItem(rawItem, index);
+      })
+    );
+
+    itemInput.value = "";
+    itemInput.focus();
+  } catch (error) {
+    console.error("Kunne ikke tilføje varer:", error);
+    alert("En eller flere varer kunne ikke tilføjes. Tjek internetforbindelsen.");
+  }
+}
+
+function splitInputIntoItems(input) {
+  return input
+    .split(/[\n,;]+/)
+    .map(function(value) {
+      return value.trim();
+    })
+    .filter(function(value) {
+      return value.length > 0;
+    });
+}
+
+async function addSingleItem(rawValue, index) {
+  const parsed = parseItemInput(rawValue);
   const newItemRef = doc(itemsCollectionRef);
 
   const item = {
@@ -332,25 +375,17 @@ async function addItemFromInput() {
     updatedAt: serverTimestamp(),
     createdBy: "Martin",
     checkedBy: "",
-    sortOrder: Date.now()
+    sortOrder: Date.now() + index
   };
 
-  try {
-    await setDoc(newItemRef, item);
+  await setDoc(newItemRef, item);
 
-    saveToHistory({
-      id: newItemRef.id,
-      ...item,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    });
-
-    itemInput.value = "";
-    itemInput.focus();
-  } catch (error) {
-    console.error("Kunne ikke tilføje vare:", error);
-    alert("Varen kunne ikke tilføjes. Tjek internetforbindelsen.");
-  }
+  saveToHistory({
+    id: newItemRef.id,
+    ...item,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  });
 }
 
 function parseItemInput(input) {
@@ -433,8 +468,15 @@ function renderApp() {
   renderActiveItems(activeItems);
   renderCheckedItems(checkedItems);
 
-  const hasNoItems = items.length === 0;
-  emptyState.classList.toggle("hidden", !hasNoItems);
+  const hasNoActiveItems = activeItems.length === 0;
+  emptyState.classList.toggle("hidden", !hasNoActiveItems);
+
+  toggleCheckedButton.textContent = showCheckedItems
+    ? `Skjul købte (${checkedItems.length})`
+    : `Vis købte (${checkedItems.length})`;
+
+  toggleCheckedButton.classList.toggle("active", showCheckedItems);
+  toggleCheckedButton.disabled = checkedItems.length === 0;
 }
 
 function renderActiveItems(activeItems) {
@@ -476,9 +518,10 @@ function renderActiveItems(activeItems) {
 function renderCheckedItems(checkedItems) {
   checkedItemsArea.innerHTML = "";
 
-  checkedItemsSection.classList.toggle("hidden", checkedItems.length === 0);
+  const shouldShowCheckedSection = showCheckedItems && checkedItems.length > 0;
+  checkedItemsSection.classList.toggle("hidden", !shouldShowCheckedSection);
 
-  if (checkedItems.length === 0) {
+  if (!shouldShowCheckedSection) {
     return;
   }
 
@@ -721,7 +764,7 @@ async function clearCheckedItems() {
     return;
   }
 
-  const confirmed = confirm(`Vil du rydde ${checkedCount} købte vare${checkedCount === 1 ? "" : "r"}?`);
+  const confirmed = confirm(`Vil du slette ${checkedCount} købte vare${checkedCount === 1 ? "" : "r"} permanent?`);
 
   if (!confirmed) {
     return;
@@ -736,9 +779,43 @@ async function clearCheckedItems() {
         return deleteDoc(doc(itemsCollectionRef, item.id));
       })
     );
+
+    showCheckedItems = false;
+    renderApp();
   } catch (error) {
     console.error("Kunne ikke rydde købte varer:", error);
     alert("De købte varer kunne ikke ryddes.");
+  }
+}
+
+async function startNewList() {
+  const totalCount = items.length;
+
+  if (totalCount === 0) {
+    return;
+  }
+
+  const confirmed = confirm(`Vil du starte en ny liste og slette alle ${totalCount} vare${totalCount === 1 ? "" : "r"}?`);
+
+  if (!confirmed) {
+    return;
+  }
+
+  lastDeletedItem = null;
+  hideToast();
+
+  try {
+    await Promise.all(
+      items.map(function(item) {
+        return deleteDoc(doc(itemsCollectionRef, item.id));
+      })
+    );
+
+    showCheckedItems = false;
+    renderApp();
+  } catch (error) {
+    console.error("Kunne ikke starte ny liste:", error);
+    alert("Listen kunne ikke ryddes.");
   }
 }
 

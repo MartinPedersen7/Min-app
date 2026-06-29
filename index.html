@@ -74,6 +74,14 @@
       <button id="changeStoreButton" class="secondary-button" type="button">
         Skift butik
       </button>
+
+      <button id="toggleCheckedButton" class="secondary-button" type="button">
+        Vis købte
+      </button>
+
+      <button id="newListButton" class="danger-button" type="button">
+        Ny liste
+      </button>
     </section>
 
     <main class="main-content">
@@ -96,14 +104,14 @@
         </form>
 
         <p class="input-help">
-          Tip: skriv fx “2 mælk”, “bananer 6 stk” eller “kaffe x2”.
+          Tip: skriv flere varer med komma, fx “mælk, rugbrød, bananer”.
         </p>
       </section>
 
       <section id="emptyState" class="empty-state hidden">
         <div class="empty-icon">🛒</div>
-        <h2>Ingen varer endnu</h2>
-        <p>Tilføj de første varer til listen.</p>
+        <h2>Ingen varer tilbage</h2>
+        <p>Tilføj varer, eller vis købte varer hvis du vil se det, der allerede er handlet.</p>
       </section>
 
       <section id="activeItemsArea" class="items-area"></section>
@@ -111,14 +119,18 @@
       <section id="checkedItemsSection" class="checked-section hidden">
         <div class="section-title-row">
           <div>
-            <p class="section-kicker">Færdige varer</p>
-            <h2>Købt</h2>
+            <p class="section-kicker">Skjult fra indkøbslisten</p>
+            <h2>Købte varer</h2>
           </div>
 
           <button id="clearCheckedButton" class="danger-button" type="button">
             Ryd købte
           </button>
         </div>
+
+        <p class="checked-help">
+          Tryk på en købt vare for at lægge den tilbage på listen.
+        </p>
 
         <div id="checkedItemsArea" class="items-area checked-items"></div>
       </section>
